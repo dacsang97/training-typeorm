@@ -4,9 +4,12 @@ import {
   PrimaryGeneratedColumn,
   Index,
   AfterInsert,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm'
 import { Validate, Length } from 'class-validator'
 import CapitalLetterValidator from '../validator/CapitalLetterValidator'
+import { TodoMetadata } from './TodoMetadata'
 
 @Entity()
 export class Todo {
@@ -26,6 +29,10 @@ export class Todo {
   @Index()
   @Column()
   public isComplete: boolean = false
+
+  @OneToOne(() => TodoMetadata)
+  @JoinColumn()
+  public metadata: TodoMetadata
 
   @AfterInsert()
   public handleAfterInsert() {

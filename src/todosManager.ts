@@ -1,14 +1,19 @@
 import { Request, Response, NextFunction } from 'express'
-import { getConnection } from 'typeorm'
+import { getConnection, Repository } from 'typeorm'
 import { validate } from 'class-validator'
 import { Todo } from './entity/Todo'
 import TodoRepository from './repository/TodoRepository'
+import { TodoMetadata } from './entity/TodoMetadata'
 
+let initialized = false
 let repository: TodoRepository
+let todoMetadataRepository: Repository<TodoMetadata>
 
 const initialize = () => {
+  initialized = true
   const connection = getConnection()
   repository = connection.getCustomRepository(TodoRepository)
+  todoMetadataRepository = connection.getRepository(TodoMetadata)
 }
 
 export const createTodo = async (
@@ -16,16 +21,20 @@ export const createTodo = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (repository === undefined) {
+  if (!initialized) {
     initialize()
   }
   try {
+    const todoMetadata = new TodoMetadata()
+    todoMetadata.comment = 'Hello comment'
     const todo = new Todo()
     todo.name = 'A Todo'
     const errors = await validate(todo)
     if (errors.length > 0) {
       throw 400
     }
+    todo.metadata = todoMetadata
+    await todoMetadataRepository.save(todoMetadata)
     await repository.save(todo)
     res.send(todo)
   } catch (error) {
