@@ -49,7 +49,8 @@
       "unicorn/filename-case": "off",
       "new-cap": "off",
       "typescript/no-inferrable-types": "off",
-      "import/no-unassigned-import": "off"
+      "import/no-unassigned-import": "off",
+      "typescript/explicit-function-return-type": "off"
     }
   },
   "husky": {

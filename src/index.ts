@@ -1,21 +1,13 @@
 import 'reflect-metadata'
 import * as Express from 'express'
 import { createConnection } from 'typeorm'
-import { Todo } from './entity/Todo'
+import { createTodo, readTodos } from './todosManager'
 
 createConnection()
-  .then(async connection => {
+  .then(async () => {
     const app = Express()
-    app.get('/create', async (_, res) => {
-      const todo = new Todo()
-      todo.name = 'A Todo'
-      await connection.manager.save(todo)
-      res.send(todo)
-    })
-    app.get('/read', async (_, res) => {
-      const todos = await connection.manager.find(Todo)
-      res.send(todos)
-    })
+    app.get('/create', createTodo)
+    app.get('/read', readTodos)
     app.listen(3000, () => console.log('App listening on port 3000'))
   })
   .catch(error => console.log(error))
