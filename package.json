@@ -42,5 +42,22 @@
     "envs": [
       "jest"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "linters": {
+      "*.{ts,js}": [
+        "xo --fix",
+        "git add"
+      ],
+      "*.{md,json}": [
+        "prettier --write",
+        "git add"
+      ]
+    }
   }
 }
