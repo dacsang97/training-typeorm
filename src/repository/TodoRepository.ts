@@ -15,7 +15,7 @@ export default class TodoRepository extends AbstractRepository<Todo> {
     return this.repository
       .find({
         cache: true,
-        relations: ['metadata'],
+        relations: ['metadata', 'author'],
         where: conditions,
       })
       .then(todos =>
@@ -30,6 +30,7 @@ export default class TodoRepository extends AbstractRepository<Todo> {
     return this.repository
       .createQueryBuilder('todo')
       .innerJoinAndSelect('todo.metadata', 'meta')
+      .innerJoinAndSelect('todo.author', 'author')
       .where('todo."isComplete" = :value', { value: false })
       .cache(true)
       .getMany()

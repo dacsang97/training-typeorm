@@ -4,16 +4,19 @@ import { validate } from 'class-validator'
 import { Todo } from './entity/Todo'
 import TodoRepository from './repository/TodoRepository'
 import { TodoMetadata } from './entity/TodoMetadata'
+import { Author } from './entity/Author'
 
 let initialized = false
 let repository: TodoRepository
 let todoMetadataRepository: Repository<TodoMetadata>
+let todoAuthorRepository: Repository<Author>
 
 const initialize = () => {
   initialized = true
   const connection = getConnection()
   repository = connection.getCustomRepository(TodoRepository)
   todoMetadataRepository = connection.getRepository(TodoMetadata)
+  todoAuthorRepository = connection.getRepository(Author)
 }
 
 export const createTodo = async (
@@ -25,6 +28,15 @@ export const createTodo = async (
     initialize()
   }
   try {
+    let author: Author
+    const authors = await todoAuthorRepository.find()
+    if (authors.length === 0) {
+      author = new Author()
+      author.name = 'Evan N'
+      await todoAuthorRepository.save(author)
+    } else {
+      author = authors[0]
+    }
     const todoMetadata = new TodoMetadata()
     todoMetadata.comment = 'Hello comment'
     const todo = new Todo()
@@ -34,6 +46,7 @@ export const createTodo = async (
       throw 400
     }
     todo.metadata = todoMetadata
+    todo.author = author
     await todoMetadataRepository.save(todoMetadata)
     await repository.save(todo)
     res.send(todo)
